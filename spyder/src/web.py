@@ -1,4 +1,4 @@
-import pixivpy3 as vpy
+#import pixivpy3 as vpy
 import requests
 import bs4
 import json
@@ -28,8 +28,8 @@ class Pixiv:
         attr=soup.find('meta',attrs={'name': 'preload-data', 'id': 'meta-preload-data'})
         content = attr['content']  
         data = json.loads(content)  
-        user_data=data['user']['23223750']
-        #作品列表
+        user_data=data['user'][USERID]
+        #作品列表2
         url2=self.album_url.replace('USERID',USERID)
         response = self.get_html(url2)
         js=response.json()
@@ -42,19 +42,23 @@ class Pixiv:
 
         return user_data,illust_list,avator_content
     
-    def get_illust_info(self,ILLUSTID):
-        url=self.illust_url.replace('ILLUSTID',ILLUSTID)
-        html=self.get_html(url).text
-        #解析作品信息
-        soup=bs4.BeautifulSoup(html,'html.parser')
-        attrs=soup.find('meta',attrs={'name': 'preload-data', 'id': 'meta-preload-data'})
+    def get_illust_info(self, ILLUSTID):
+        url = self.illust_url.replace('ILLUSTID', ILLUSTID)
+        html = self.get_html(url).text
+        # 解析作品信息
+        soup = bs4.BeautifulSoup(html, 'html.parser')
+        attrs = soup.find('meta', attrs={'name': 'preload-data', 'id': 'meta-preload-data'})
         content = attrs['content']
         js = json.loads(content)
+        with open('illust.json', 'w', encoding='utf-8') as f:
+            json.dump(js, f, ensure_ascii=False, indent=4)
         js2 = js["illust"][ILLUSTID]
-        #插图本体
-        image_url = js["urls"]["original"]
+        with open('illust2.json', 'w', encoding='utf-8') as f:
+            json.dump(js2, f, ensure_ascii=False, indent=4)
+        # 插图本体
+        image_url = js2["urls"]["original"]
         image_content = self.get_html(image_url).content
-        return js2,image_content
+        return js2, image_content
 
 
     #辅助函数，不需要直接调用
